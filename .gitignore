@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Colab temp files
+*.pyc
+
+# Model weights & saved models
+*.h5
+*.keras
+*.pb
+saved_model/
+checkpoints/
+
+# Dataset files (large binaries)
+*.tar.gz
+*.zip
+*.npz
+*.npy
+data/
+
+# Logs & TensorBoard
+logs/
+runs/
+*.log
+tensorboard_logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Credentials & secrets
+*.env
+.env
+secrets.json
