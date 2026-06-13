@@ -1,118 +1,105 @@
-# CNN Image Classifier — CIFAR-10
+# CNN AHD Model — CIFAR-10 Image Classifier
 
-A Convolutional Neural Network (CNN) built with Keras/TensorFlow to classify images from the CIFAR-10 dataset into 10 categories. The project demonstrates the impact of regularization techniques (Dropout + Batch Normalization) on reducing overfitting.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/0x41hd/Cnn_Ahd_Model/blob/main/cnn_ahd.ipynb)
 
----
-
-## Dataset
-
-**CIFAR-10** — 60,000 color images (32×32 px) across 10 classes:
-
-`airplane` · `automobile` · `bird` · `cat` · `deer` · `dog` · `frog` · `horse` · `ship` · `truck`
-
-- 50,000 training images
-- 10,000 test images
+A Convolutional Neural Network (CNN) trained on the [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) dataset, achieving ~84% validation accuracy. Built and trained in Google Colab with a T4 GPU.
 
 ---
 
-## Model Architecture
+## Overview
 
-Two models were trained and compared:
+This project implements and iteratively improves a CNN for 10-class image classification. Two model versions are explored:
 
-### Model v1 — Baseline (without regularization)
-```
-Conv2D(32) → Conv2D(64) → MaxPool →
-Conv2D(64) → MaxPool →
-Conv2D(128) → MaxPool →
-Flatten → Dense(128) → Dense(10, softmax)
-```
-- **Result:** ~97% train accuracy / ~75% test accuracy → **severe overfitting**
+- **V1 (Baseline):** Simple CNN — 4 Conv2D blocks + Dense layers. Reaches ~77% val accuracy but overfits heavily after epoch 7.
+- **V2 (Improved):** Adds `Dropout` and `BatchNormalization` to combat overfitting. Reaches **~84% val accuracy** with stable training.
 
-### Model v2 — Regularized (final model saved as `cnn_Ahd_v1.h5`)
+The final model is saved as `cnn_Ahd_v1.h5` and evaluated using a confusion matrix and random prediction samples.
+
+---
+
+## Dataset — CIFAR-10
+
+| Property | Value |
+|---|---|
+| Training samples | 50,000 |
+| Test samples | 10,000 |
+| Image size | 32 × 32 × 3 (RGB) |
+| Classes | 10 |
+
+**Classes:** airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck
+
+---
+
+## Model Architecture (V2)
+
 ```
-Conv2D(32) → Dropout(0.2) → BatchNorm →
-Conv2D(64) → MaxPool → Dropout(0.2) → BatchNorm →
-Conv2D(64) → MaxPool → Dropout(0.2) → BatchNorm →
-Conv2D(128) → MaxPool → Dropout(0.2) →
-Flatten → Dropout(0.2) → BatchNorm →
-Dense(128) → Dropout(0.2) → BatchNorm →
-Dense(10, softmax)
+Input (32×32×3)
+  → Conv2D(32, 3×3, relu) → Dropout(0.2) → BatchNorm
+  → Conv2D(64, 3×3, relu) → MaxPool(2) → Dropout(0.2) → BatchNorm
+  → Conv2D(64, 3×3, relu) → MaxPool(2) → Dropout(0.2) → BatchNorm
+  → Conv2D(128, 3×3, relu) → MaxPool(2) → Dropout(0.2)
+  → Flatten → Dropout(0.2) → BatchNorm
+  → Dense(128, relu) → Dropout(0.2) → BatchNorm
+  → Dense(10, softmax)
 ```
-- **Result:** ~85% train accuracy / ~84% test accuracy → **much better generalization**
+
+**Total trainable parameters:** ~398K
+
+---
+
+## Training
+
+| Parameter | Value |
+|---|---|
+| Optimizer | Adam |
+| Loss | Categorical Crossentropy |
+| Epochs | 30 |
+| Batch size | 64 |
+| Input normalization | Pixel values divided by 255 |
+| Labels | One-hot encoded |
 
 ---
 
 ## Results
 
-| Model | Train Accuracy | Test Accuracy | Overfitting |
-|-------|---------------|--------------|-------------|
-| Baseline | ~97% | ~75% | Severe |
-| Regularized | ~85% | ~84% | Minimal |
-
-Adding **Dropout** and **Batch Normalization** reduced the train/test gap from ~22% down to ~1%.
+| Metric | V1 (Baseline) | V2 (Regularized) |
+|---|---|---|
+| Best val accuracy | ~77.3% | ~84.0% |
+| Overfitting | Severe | Minimal |
 
 ---
 
-## Setup
+## Requirements
 
-```bash
-# Install dependencies
-pip install tensorflow numpy pandas matplotlib seaborn scikit-learn
-
-# Open the notebook in Google Colab or Jupyter
-jupyter notebook cnn_ahd.ipynb
+```
+tensorflow >= 2.x
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
 ```
 
-> **Recommended:** Run on Google Colab with GPU (T4) for faster training.
+Install via:
+
+```bash
+pip install tensorflow numpy pandas matplotlib seaborn scikit-learn
+```
 
 ---
 
 ## Usage
 
-```python
-from keras.models import load_model
-import numpy as np
+Open the notebook directly in Google Colab using the badge at the top, or clone and run locally:
 
-# Load the trained model
-model = load_model("cnn_Ahd_v1.h5")
-
-# Predict on new images (normalized to 0-1 range)
-image = image.astype("float32") / 255.0
-image = np.expand_dims(image, axis=0)  # add batch dimension
-
-predictions = model.predict(image)
-predicted_class = labels[np.argmax(predictions)]
-```
-
-**Classes:**
-```python
-labels = ["airplane", "automobile", "bird", "cat", "deer",
-          "dog", "frog", "horse", "ship", "truck"]
+```bash
+git clone https://github.com/0x41hd/Cnn_Ahd_Model.git
+cd Cnn_Ahd_Model
+jupyter notebook cnn_ahd.ipynb
 ```
 
 ---
 
-## Key Takeaways
+## License
 
-- **Batch Normalization** stabilizes training and speeds up convergence
-- **Dropout** prevents co-adaptation of neurons and reduces overfitting
-- Both techniques together allow the model to generalize well on unseen data
-- Without regularization, the model memorizes the training data instead of learning patterns
-
----
-
-## Training Details
-
-| Parameter | Value |
-|-----------|-------|
-| Optimizer | Adam |
-| Loss | Categorical Crossentropy |
-| Epochs | 30 |
-| Batch Size | 64 |
-| Input Shape | (32, 32, 3) |
-
----
-
-## Open in Colab
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/0x41hd/Cnn_Ahd_Model/blob/main/cnn_ahd.ipynb)
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
